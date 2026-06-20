@@ -179,7 +179,7 @@ These patterns appear in virtually every professional Node/Express/MERN project:
 ## Environment Variables
 
 ```env
-PORT=8000
+PORT=_____
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/<dbname>
 ```
 
@@ -198,12 +198,48 @@ Server starts at `http://localhost:8000`
 
 ---
 
+---
+
+## Models (MongoDB — M)
+
+### `src/models/User.js` — User Schema
+- Fields: `username`, `email`, `fullName`, `avatar`, `coverImage`, `watchHistory`, `password`, `refreshToken`
+- `avatar` and `coverImage` store Cloudinary URLs (not files directly)
+- `watchHistory` is an array of ObjectId refs to the `Video` model
+- `timestamps: true` auto-adds `createdAt` and `updatedAt`
+- **MERN Part: M (MongoDB)** — Mongoose schema + model
+
+Custom methods on the schema:
+
+| Method | What it does |
+|--------|-------------|
+| `pre("save")` | Hashes password with bcrypt before saving — runs only if password was modified |
+| `isPasswordCorrect()` | Compares plain password with stored hash using bcrypt |
+| `generateAccessToken()` | Signs a JWT with user's `_id`, `email`, `username`, `fullName` — short-lived |
+| `generateRefreshToken()` | Signs a JWT with only `_id` — long-lived, used to refresh access token |
+
+> These methods make the User model self-contained for authentication — no need for separate auth helper files.
+
+---
+
+### `src/models/video.js` — Video Schema
+- Fields: `videoFile`, `thumbnail`, `title`, `description`, `duration`, `views`, `isPublished`, `owner`
+- `videoFile` and `thumbnail` store Cloudinary URLs
+- `owner` is an ObjectId ref to the `User` model — links video to its creator
+- `views` defaults to `0`, `isPublished` defaults to `true`
+- `timestamps: true` auto-adds `createdAt` and `updatedAt`
+- **MERN Part: M (MongoDB)** — Mongoose schema + model
+
+---
+
 ## Folder Stubs (To Be Implemented)
 
 | Folder | What Goes Here |
 |--------|---------------|
-| `src/models/` | Mongoose schemas — User, Post, etc. (MongoDB — M) |
+| `src/models/` | Mongoose schemas — `User.js`, `video.js` (MongoDB — M) |
 | `src/controllers/` | Business logic functions called by routes (Express — E) |
+| `src/models/User.js` | User schema with auth methods — JWT + bcrypt (MongoDB — M) |
+| `src/models/video.js` | Video schema with Cloudinary URLs and owner ref (MongoDB — M) |
 | `src/routes/` | Express Router definitions, maps URLs to controllers (Express — E) |
 | `src/middlewares/` | Auth middleware, error handler middleware (Express — E) |
 | `public/temp/` | Temporary storage for file uploads before pushing to cloud |
