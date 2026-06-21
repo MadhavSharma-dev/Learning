@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const videoSchema = new Schema({
+const videoSchema = new mongoose.Schema({
     videoFile : {
         type : String, //Cloudinary url
         required : true
@@ -29,7 +29,7 @@ const videoSchema = new Schema({
         default : true
     },
     owner : {
-        type : Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref : "User"
     }
 },{timestamps : true});
